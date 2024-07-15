@@ -1,0 +1,6 @@
+server:
+  version: '1.16'
+  online-mode: false
+  port: 25565
+player:
+  defaultWorld: 'world'
