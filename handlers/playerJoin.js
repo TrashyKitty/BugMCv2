@@ -10,11 +10,62 @@ const mcData = require('minecraft-data')('1.16')
 const fs = require('fs');
 let clientStates = {};
 let entityIdIndex = 150;
+function sendBroadcastMessage(server, clients, message, sender) {
+    if (mcData.supportFeature('signedChat')) {
+        server.writeToClients(clients, 'player_chat', {
+            plainMessage: message,
+            signedChatContent: '',
+            unsignedChatContent: JSON.stringify({ text: message }),
+            type: 0,
+            senderUuid: 'd3527a0b-bc03-45d5-a878-2aafdd8c8a43', // random
+            senderName: JSON.stringify({ text: sender }),
+            senderTeam: undefined,
+            timestamp: Date.now(),
+            salt: 0n,
+            signature: mcData.supportFeature('useChatSessions') ? undefined : Buffer.alloc(0),
+            previousMessages: [],
+            filterType: 0,
+            networkName: JSON.stringify({ text: sender })
+        });
+    } else {
+        server.writeToClients(clients, 'chat', { message: JSON.stringify({ text: message }), position: 0, sender: sender || '0' });
+    }
+}
+
+function broadcast(message, exclude, username) {
+    sendBroadcastMessage(server, Object.values(server.clients).filter(client => client !== exclude), message);
+}
 function getEntityId() {
     entityIdIndex++;
     return entityIdIndex;
 }
 server.on('playerJoin', async (client) => {
+    client.on('chat', data => {
+        if(data.message == "/list") {
+            sendBroadcastMessage(server, [client], `§eThere are §b${players.length} player(s) §eonline: §r${players.join('§7, §r')}`);
+            return;
+        }
+        if(data.message.startsWith("/tp ")) {
+            try {
+                let args = data.message.split(' ').slice(1);
+                let arg1 = parseInt(args[0]);
+                let arg2 = parseInt(args[1]);
+                let arg3 = parseInt(args[2]);
+                client.write('position', {
+                    x: arg1,
+                    y: arg2,
+                    z: arg3,
+                    yaw: 0,
+                    pitch: 0,
+                    flags: 0x00
+                });
+            
+            } catch {}
+            return;
+        }
+        let adminUsernames = ["TrashyKitty","FruitKitty_"]
+        broadcast((adminUsernames.includes(client.username) ? "§b[BugMC Admin] §r" : "§f") + "<" + client.username + "> " + data.message, null, client.username);
+    })
     // client.on('packet', (...args)=>{
         // console.log(args)
     // })
