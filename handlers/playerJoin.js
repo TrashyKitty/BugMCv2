@@ -14,9 +14,12 @@ function getEntityId() {
     entityIdIndex++;
     return entityIdIndex;
 }
-server.on('login', async (client) => {
+server.on('playerJoin', async (client) => {
+    // client.on('packet', (...args)=>{
+        // console.log(args)
+    // })
+    console.log(client.profile)
     client.id = getEntityId();
-    client.uuid = randomUUID();
     let clientState = { "world": "world", playerSlots: [], currSlot: 0 };
     client.clientState = clientState;
     clientStates[client.id] = clientState;

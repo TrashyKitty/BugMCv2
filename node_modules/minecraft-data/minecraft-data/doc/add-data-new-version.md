@@ -25,13 +25,17 @@ For bedrock edition see [bedrock.md](bedrock.md)
 | mapIcons.json | No | Icons data can be found in the Minecraft source directly. Alternatively you might be able to look up the icons from the following page on the [Minecraft wiki][7] or from [wiki.vg][8]. | [minecraft-data pr mapIcons][9] | 
 | loginPacket.json | Yes | Running tests on [node-minecraft-protocol][10] |
 | sounds.json | Yes | Use [minecraft-data-generator-server][2] | Make sure to check the packets that use this and the friendlybytebuffer functions to check if an offset is needed in the generator code.
+| foods.json| Yes | Use [minecraft-data-generator-server][2] | move file obtained with [minecraft-data-generator-server][2] to the correct location and run `extractPcFoods.js` script located in `tools/js`|
 
 
 * All files that say Yes for auto can be gotten from [minecraft-data-auto-updater][9] (that uses [minecraft-data-generator-server][2]). This is the preferred way to extract the data.
+* **Note**, there is a script inside the `tools/js` folder that can be run with `npm run version` with usage of `npm run version <bedrock|pc> {version} {protocol_version}` to automatically copy over old data including the protocol in support for a new version and update entries in the dataPaths.json.
 
 After generating and creating the new files for the version in its own directory, the version must be added to dataPaths.json in the data folder.
 Additionally in data/pc/common the versions.json file needs to be updated with the new version.
 
+## Protocol data
+* See [protocol.md] for information on the protocol and how to update the data
   
 [1]: https://wiki.vg/Pre-release_protocol
 [2]: https://github.com/PrismarineJS/minecraft-data-generator-server
